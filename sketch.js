@@ -2,16 +2,16 @@ const width = 1000;
 const height = 1000;
 let peakHeights = [];
 let indices = [];
+let maxPeakHeight = random(0.95);
+let vertices = floor(random(11));
 
 function setup() {
 
   createCanvas(width, height)
   background(0);
-  let vertices = floor(random(11));
   while (vertices % 2 == 0) {
     vertices = floor(random(11));
   }
-  let maxPeakHeight = random(0.95);
   for (var i = 0; i < vertices; i++) {
     if (i == 0) {
       peakHeights[i] = maxPeakHeight;
