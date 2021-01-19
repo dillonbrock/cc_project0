@@ -1,21 +1,24 @@
 const width = 1000;
 const height = 1000;
 let peakHeights = [];
+let valleyHeights = [];
 let indices = [];
-let peakHeights = [];
-let maxPeakHeight = 0.3;
+let maxPeakHeight = 0.7;
+let minPeakHeight = 0.5;
 let vertices;
 
 function setup() {
 
   createCanvas(width, height)
+  noLoop();
   background(0);
   vertices = floor(random(5, 13));
   while (vertices % 2 == 0) {
     vertices = floor(random(5, 13));
   }
   for (var i = 0; i < vertices; i++) {
-    peakHeights[i] = random(0.3, 0.95);
+    peakHeights[i] = random(0.7, 0.95);
+    valleyHeights[i] = random(0.2, 0.5);
   }
   for (var i = 0; i < peakHeights.length; i++) {
     if (peakHeights[i] <= maxPeakHeight) {
@@ -23,7 +26,13 @@ function setup() {
     } else {
       maxPeakHeight = peakHeights[i];
     }
+    if (peakHeights[i] >= minPeakHeight) {
+
+    } else {
+      minPeakHeight = peakHeights[i];
+    }
   }
+  console.log(vertices);
 }
 
 
@@ -36,38 +45,28 @@ function draw() {
     line(0, 1000-i, 1000, 1000-i);
   }
 
-  // // for (var i = 0; i < lowerLines.length; i++) {
-  // //   lowerLines[i].display();
-  // // }
-  // // for (var i = 0; i < upperLines.length; i++) {
-  // //   upperLines[i].display();
-  // // }
-
-  // // fill(0);
-  // // noStroke();
-  // // beginShape();
-  // // vertex(0,0);
-  // // vertex(0, 0.7*height);
-  // // vertex(0.2*width, 0.3*height);
-  // // vertex(0.4*width, 0.5*height);
-  // // vertex(0.6*width, 0.2*height);
-  // // vertex(0.8*width, 0.6*height);
-  // // vertex(width, 0.25*height);
-  // // vertex(width, 0);
-  // // endShape();
-
-  // drawMountains(vertices, maxPeakHeight);
+  drawBackground(vertices);
 
 }
 
-function drawMountains(numOfVertices) {
+function drawBackground(numOfVertices) {
 
-  fill(0);
+  //fill(0);
   noStroke();
   beginShape();
   vertex(0,0);
-
+  for (var i = 0; i < peakHeights.length; i++) {
+    if (i % 2 == 0) {
+    vertex(i * (width/(numOfVertices)), (1-valleyHeights[i]) * height);
+  } else {
+    vertex(i * (width/(numOfVertices)), (1-peakHeights[i]) * height);
+    }
+  }
   vertex(width, 0);
+  // for (var i = 0; i < height * (1-maxPeakHeight); i++)
+  //   strokeWeight(1);
+  //   stroke(255-(i*)
+    line(0)
   endShape();
 
 }
