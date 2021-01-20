@@ -3,19 +3,21 @@ const height = 1000;
 let peakHeights = [];
 let valleyHeights = [];
 let maxPeakHeight = 0.7;
-let minPeakHeight = 0.5;
+let minPeakHeight = 0.95;
+let minValleyHeight = 0.5;
 let allHeights = [];
 let vertices;
-let orderedHeights = [];
+let orderedPeakHeights = [];
+let orderedValleyHeights = [];
 
 function setup() {
 
   createCanvas(width, height)
   noLoop();
   background(0);
-  vertices = floor(random(5, 13));
+  vertices = floor(random(5, 10));
   while (vertices % 2 == 0) {
-    vertices = floor(random(5, 13));
+    vertices = floor(random(5, 10));
   }
   for (var i = 0; i < (vertices-1)/2; i++) {
     peakHeights[i] = random(0.7, 0.95);
@@ -28,6 +30,11 @@ function setup() {
 
     } else {
       maxPeakHeight = peakHeights[i];
+    }
+    if (peakHeights[i] >= minValleyHeight) {
+
+    } else {
+      minValleyHeight = peakHeights[i];
     }
     if (peakHeights[i] >= minPeakHeight) {
 
@@ -46,13 +53,22 @@ function setup() {
   for (var i = 0; i < peakHeights.length; i++) {
     let maxVal = 0;
     for (var j = 0; j < peakHeights.length; j++) {
-        if (peakHeights[j] > maxVal && !orderedHeights.includes(peakHeights[j])) {
+        if (peakHeights[j] > maxVal && !orderedPeakHeights.includes(peakHeights[j])) {
           maxVal = peakHeights[j];
         }
       }
-      orderedHeights.push(maxVal);
+      orderedPeakHeights.push(maxVal);
     }
-  //console.log(orderedHeights[1]);
+  //console.log(orderedPeakHeights[1]);
+  for (var i = 0; i < valleyHeights.length; i++) {
+    let minVal = 0;
+    for (var j = 0; j < valleyHeights.length; j++) {
+        if (valleyHeights[j] < minVal && !orderedValleyHeights.includes(valleyHeights[j])) {
+          minVal = valleyHeights[j];
+        }
+      }
+      orderedValleyHeights.push(minVal);
+    }
 }
 
 
@@ -86,27 +102,46 @@ function drawBackground(numOfVertices) {
   endShape();
 
 
-  for (var i = 0; i < height * (1-minPeakHeight); i++) {
+  for (var i = 0; i < height * (1-minValleyHeight); i++) {
     strokeWeight(1);
-    stroke(255-(i*255/(height*(1-minPeakHeight))));
+    stroke(255-(i*255/(height*(1-minValleyHeight))));
     if (i < height * (1-maxPeakHeight)) {
       line(0, i, 1000, i);
     }
-    else if (i >= height*(1-maxPeakHeight) && i < height * (1-orderedHeights[1])) {
+    else if (i >= height*(1-maxPeakHeight) && i < height * (1-orderedPeakHeights[1])) {
       line(0, i, findxOffset(maxPeakHeight, -1, i), i);
       line(findxOffset(maxPeakHeight, 1, i), i, width, i);
     }
+    else if (i >= height * (1-orderedPeakHeights[1]) && (peakHeights.length == 2 || (i < height * (1-orderedPeakHeights[2])))) {
+      if (allHeights.indexOf(orderedPeakHeights[1]) < allHeights.indexOf(orderedPeakHeights[0])) {    //if second tallest peak comes first
+        line(0, i, findxOffset(orderedPeakHeights[1], -1, i), i);
+        line(findxOffset(orderedPeakHeights[1], 1, i), i, findxOffset(orderedPeakHeights[0], -1, i), i);
+        line(findxOffset(orderedPeakHeights[0], 1, i), i, width, i);
+        if (peakHeights.length == 2) {
+          //shallowest valley to deepest and shortest peak to tallest
+          if(valleyHeights.indexOf(orderedValleyHeights[2]) < valleyHeights.indexOf(orderedValleyHeights[1]) && valleyHeights.indexOf(orderedValleyHeights[1]) < valleyHeights.indexOf(orderedValleyHeights[0])) {
+            // hasn't reached shallowest valley yet
+            if (i < height*(1-orderedValleyHeights[2])) {
+              line(0, i, findxOffset(orderedPeakHeights[1], -1, i), i);
+              line(findxOffset(orderedPeakHeights[1], 1, i), i, findxOffset(orderedPeakHeights[0], -1, i), i);
+              line(findxOffset(orderedPeakHeights[0], 1, i), i, width, i);
+            } else if (i < height*(1-orderedValleyHeights[1])) {
+                line(findxOffset(orderedPeakHeights[1], 1, i), i, findxOffset(orderedPeakHeights[0], -1, i), i);
+                line(findxOffset(orderedPeakHeights[0], 1, i), i, width, i);
+            } else {
+              line(findxOffset(orderedPeakHeights[0], 1, i), i, width, i);
+            }
+          } else if {
+
+          }
+        }
+      } else {    // tallest peak comes first
+        line(0, i, findxOffset(orderedPeakHeights[0], -1, i), i);
+        line(findxOffset(orderedPeakHeights[0], 1, i), i, findxOffset(orderedPeakHeights[1], -1, i), i);
+        line(findxOffset(orderedPeakHeights[1], 1, i), i, width, i);
+      }
+    }
   }
-
-  // allHeights[allHeights.indexOf(maxPeakHeight)-1]
-
-  // for (var i = 0; i < height * (peakHeights[0]-valleyHeights[0]); i++) {
-  //   strokeWeight(1);
-  //   stroke();
-  //   line(0, i + (1-peakHeights[0])*height, ((1-valleyHeights[0])*height -(i + (1-peakHeights[0])*height)) * ((width/(vertices-1))/((peakHeights[0]-valleyHeights[0])*height)), i + (1-peakHeights[0])*height);
-  // }
-
-
 }
 
 
@@ -117,6 +152,17 @@ function findxOffset(peakHeight, side, num) {     //side is -1 (left) or +1 (rig
     return (allHeights.indexOf(peakHeight))*(width/(vertices-1))+((num-height*(1-peakHeight))*((width/(vertices-1))/((peakHeight-allHeights[allHeights.indexOf(peakHeight)+1])*height)));
   }
 }
+
+function drawUpperGradient(numOfPeaks) {
+  for (var i = 0; i < height * (1-minValleyHeight); i++) {
+    strokeWeight(1);
+    stroke(255-(i*255/(height*(1-minValleyHeight))));
+    if (i < height * (1-maxPeakHeight)) {
+      line(0, i, 1000, i);
+    }
+  }
+}
+
 
 
 
