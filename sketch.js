@@ -21,9 +21,9 @@ function setup() {
   noLoop();
   background(0);
   console.log(Number('012'));
-  vertices = floor(random(5,6));
+  vertices = floor(random(5,10));
   while (vertices % 2 == 0) {
-    vertices = floor(random(5,6));
+    vertices = floor(random(5,10));
   }
   for (var i = 0; i < (vertices-1)/2; i++) {
     peakHeights[i] = random(0.7, 0.95);
@@ -92,15 +92,7 @@ function draw() {
     gradientLines[i].display();
   }
 
-
 }
-
-
-
-
-
-
-
 
 class GradientLine {
 
@@ -173,7 +165,7 @@ class GradientLine {
         else if (i/2 == valleyHeights.length - 1) {
           if (this.lineHeight < height * (1 - valleyHeights[valleyHeights.length - 1])) {
             collisionPoints[i] = this.findxOffset(peakHeights[i/2 - 1], 1, this.lineHeight);
-            collisionPoints[i+1] = this.findxOffset(width);
+            collisionPoints[i+1] = width;
           }
           else {
             collisionPoints[i] = -1;
