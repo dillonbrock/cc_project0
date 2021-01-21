@@ -12,15 +12,16 @@ let orderedPeakHeights = [];
 let orderedValleyHeights = [];
 var gradientLines = [];
 var snowCaps = [];
+var mountainLines = [];
 
 function setup() {
 
   createCanvas(width, height)
   noLoop();
   background(0);
-  vertices = floor(random(5,10));
+  vertices = floor(random(7,12));
   while (vertices % 2 == 0) {
-    vertices = floor(random(5,10));
+    vertices = floor(random(7,12));
   }
   for (var i = 0; i < (vertices-1)/2; i++) {
     peakHeights[i] = random(0.7, 0.9);
@@ -75,6 +76,10 @@ function setup() {
   for (var i = 0; i < peakHeights.length; i++) {
     snowCaps.push(new SnowCap(i));
   }
+
+  // for (var i = 0; i < width/(vertices-1); i++) {
+  //   mountainLines.push(new mountainGradient(i, 0));
+  // }
 
 }
 
@@ -201,21 +206,40 @@ class SunsetGradient {
   }
 }
 
-class mountainGradient {
 
-  constructor(whichLine, peak) {
-    this.whichLine = whichLine;
-    this.peak = peak;
-  }
 
-  findxOffset() {
-    
-  }
 
-  display() {
+// class mountainGradient {
 
-  }
-}
+//   constructor(whichLine, peak) {
+//     this.whichLine = whichLine;
+//     this.peak = peak;
+//     this.pkHeight = peakHeights[this.peak];
+//   }
+
+//   findLineHeight() {
+//     if (this.whichLine < (allHeights[allHeights.indexOf(this.pkHeight)] * (width/(vertices-1)))) {
+//       return height*(1-allHeights[allHeights.indexOf(this.pkHeight) - 1]) - this.whichLine/((width/(vertices-1))/((this.pkHeight - allHeights[allHeights.indexOf(this.pkHeight) - 1])*height));
+//     }
+//     else if (this.whichLine == allHeights[allHeights.indexOf(this.pkHeight)] * (width/(vertices-1))) {
+//       return height*(1-this.pkHeight);
+//     }
+//     else if (this.whichLine > allHeights[allHeights.indexOf(this.pkHeight)] * (width/(vertices-1))) {
+//       //return height - (allHeights[allHeights.indexOf(this.pkHeight + 1)] + this.whichLine)
+//     }
+//   }
+
+//   display() {
+//     strokeWeight(1);
+//     stroke(20+this.whichLine*180/(2*width/(vertices-1)));
+//     line(this.whichLine, height, this.whichLine, this.findLineHeight()); //height* (1 - allHeights[allHeights.indexOf(this.pkHeight) - 1]));
+
+//   }
+// }
+
+
+
+
 
 class SnowCap {
 
@@ -235,13 +259,13 @@ class SnowCap {
 
   display() {
 
-    var snowDipWidth = (this.rightSideofSlope(peakHeights[this.peak]) - this.leftSideofSlope(peakHeights[this.peak]))/4;
-    var snowDipHeight = 20;
+    var snowDipWidth = (this.rightSideofSlope(peakHeights[this.peak]) - this.leftSideofSlope(peakHeights[this.peak]))/6;
+    var snowDipHeight = 15;
     stroke(180);
     fill(255);
     beginShape();
     vertex(allHeights.indexOf(peakHeights[this.peak])*width/(vertices - 1), height * (1 - peakHeights[this.peak]));
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 7; i++) {
       if (i % 2 == 0) {
         vertex(this.leftSideofSlope(peakHeights[this.peak]) + i * snowDipWidth, height * (1-peakHeights[this.peak]) + 100);
       }
