@@ -1,6 +1,6 @@
 
-const width = 1000;
-const height = 1000;
+const width = 900;
+const height = 900;
 let peakHeights = [];
 let valleyHeights = [];
 let maxPeakHeight = 0.7;
@@ -10,26 +10,23 @@ let allHeights = [];
 let vertices;
 let orderedPeakHeights = [];
 let orderedValleyHeights = [];
-let numberedValleys = [];
-let valleyNumber;
-let numberedPeaks = [];
 var gradientLines = [];
+var snowCaps = [];
 
 function setup() {
 
   createCanvas(width, height)
   noLoop();
   background(0);
-  console.log(Number('012'));
   vertices = floor(random(5,10));
   while (vertices % 2 == 0) {
     vertices = floor(random(5,10));
   }
   for (var i = 0; i < (vertices-1)/2; i++) {
-    peakHeights[i] = random(0.7, 0.95);
+    peakHeights[i] = random(0.7, 0.9);
   }
   for (var i = 0; i < (vertices+1)/2; i++) {
-    valleyHeights[i] = random(0.2, 0.5);
+    valleyHeights[i] = random(0.3, 0.5);
   }
   for (var i = 0; i < peakHeights.length; i++) {
     if (peakHeights[i] > maxPeakHeight) {
@@ -61,7 +58,6 @@ function setup() {
     }
       orderedPeakHeights.push(maxVal);
   }
-  //console.log(orderedPeakHeights[1]);
   for (var i = 0; i < valleyHeights.length; i++) {
     let minVal = 0.5;
     for (var j = 0; j < valleyHeights.length; j++) {
@@ -73,7 +69,11 @@ function setup() {
   }
 
   for (var i = 0; i < height * (1-minValleyHeight); i++) {
-    gradientLines.push(new GradientLine(i));
+    gradientLines.push(new SunsetGradient(i));
+  }
+
+  for (var i = 0; i < peakHeights.length; i++) {
+    snowCaps.push(new SnowCap(i));
   }
 
 }
@@ -85,16 +85,20 @@ function draw() {
   for (var i = 0; i < height * maxPeakHeight; i++) {
     strokeWeight(1);
     stroke(i*(255/(height*maxPeakHeight)));
-    line(0, 1000-i, 1000, 1000-i);
+    line(0, height-i, width, height-i);
   }
 
   for (var i = 0; i < gradientLines.length; i++) {
     gradientLines[i].display();
   }
 
+  for (var i = 0; i < snowCaps.length; i++) {
+    snowCaps[i].display();
+  }
+
 }
 
-class GradientLine {
+class SunsetGradient {
 
   constructor(lineHeight) {
     this.lineHeight = lineHeight;
@@ -177,10 +181,14 @@ class GradientLine {
       return collisionPoints;
   }
 
+  get collisionPoints() {
+    return this.findCollisionPoints();
+  }
+
   display() {
 
     strokeWeight(1);
-    stroke(255-(this.lineHeight*255/(height*(1-minValleyHeight))));
+    stroke(this.lineHeight*207/(height*(1-minValleyHeight)),49,67+this.lineHeight*25/(height*(1-minValleyHeight)));
     if (this.lineHeight < height * (1 - maxPeakHeight)) {
       line(0, this.lineHeight, width, this.lineHeight);
     }
@@ -193,52 +201,56 @@ class GradientLine {
   }
 }
 
+class mountainGradient {
 
+  constructor(whichLine, peak) {
+    this.whichLine = whichLine;
+    this.peak = peak;
+  }
 
+  findxOffset() {
+    
+  }
 
+  display() {
 
+  }
+}
 
+class SnowCap {
 
+  constructor(peak) {
+    this.peak = peak;
 
+  }
 
+  rightSideofSlope(peakHeight) {
+    return (allHeights.indexOf(peakHeight))*(width/(vertices-1))+((height*(1-peakHeights[this.peak]) + 100-height*(1-peakHeight))*((width/(vertices-1))/((peakHeight-allHeights[allHeights.indexOf(peakHeight)+1])*height)));
+  }
 
+  leftSideofSlope(peakHeight) {
+    return (allHeights.indexOf(peakHeight))*(width/(vertices-1))-((height*(1-peakHeights[this.peak]) + 100-height*(1-peakHeight))*((width/(vertices-1))/((peakHeight-allHeights[allHeights.indexOf(peakHeight)-1])*height)));
+  }
+  
 
+  display() {
 
+    var snowDipWidth = (this.rightSideofSlope(peakHeights[this.peak]) - this.leftSideofSlope(peakHeights[this.peak]))/4;
+    var snowDipHeight = 20;
+    stroke(180);
+    fill(255);
+    beginShape();
+    vertex(allHeights.indexOf(peakHeights[this.peak])*width/(vertices - 1), height * (1 - peakHeights[this.peak]));
+    for (var i = 0; i < 5; i++) {
+      if (i % 2 == 0) {
+        vertex(this.leftSideofSlope(peakHeights[this.peak]) + i * snowDipWidth, height * (1-peakHeights[this.peak]) + 100);
+      }
+      else {
+        vertex(this.leftSideofSlope(peakHeights[this.peak]) + i * snowDipWidth, height*(1-peakHeights[this.peak]) + 100 + snowDipHeight);
+      }
+    endShape();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    }
+  }
+}
 
